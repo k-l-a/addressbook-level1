@@ -58,9 +58,14 @@
   find Betsy
   # find multiple with same keyword
   find Dickson
+
+  #Additional testing
+    find xkxkxkxk
+    find NOBODY
+    find -+-
+
   # find multiple with some keywords
   find Charlie Betsy
-
 ##########################################################
 # test delete person command
 ##########################################################
