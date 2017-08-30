@@ -518,6 +518,8 @@ public class AddressBook {
         switch(dataType) {
             case "name" :
                 return isPersonNameValid(val);
+            case PERSON_DATA_PREFIX_PHONE :
+                return isPersonPhoneValid(val);
         }
         //if invalid data type, false.
         return false;
