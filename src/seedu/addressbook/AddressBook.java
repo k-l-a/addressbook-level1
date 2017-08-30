@@ -466,6 +466,26 @@ public class AddressBook {
         targetPerson.put(field, value);
         return getMessageForSuccessfulEdit(targetPerson);
     }
+
+    /**
+     * Check if the given argument is a valid Edit argument.
+     * @param rawArgs
+     *          argument to check
+     * @return true if valid
+     *          false otherwise
+     */
+    private static boolean isEditPersonArgsValid(String rawArgs) {
+        try {
+            ArrayList<String> argArray = splitByWhitespace((rawArgs));
+            if(argArray.size() < MIN_EDIT_COMMAND_ARGS || argArray.size() > MAX_EDIT_COMMAND_ARGS) {
+                return false;
+            }
+            extractTargetIndexFromDeletePersonArgs(argArray.get(0));
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
     /**
      * Adds a person (specified by the command args) to the address book.
      * The entire command arguments string is treated as a string representation of the person to add.
