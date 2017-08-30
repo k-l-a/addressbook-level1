@@ -748,7 +748,7 @@ public class AddressBook {
     /**
      * Shows a message to the user
      */
-    private static void showToUser(String[] message) {
+    private static void showToUser(String... message) {
         for (String m : message) {
             showToUser(m);
         }
