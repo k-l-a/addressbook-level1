@@ -1229,6 +1229,11 @@ public class AddressBook {
                 + getUsageInfoForHelpCommand();
     }
 
+    private static String getUsageInfoForEditCommand() {
+        return String.format(MESSAGE_COMMAND_HELP, COMMAND_EDIT_WORD, COMMAND_EDIT_DESC) + LS
+                + String.format(MESSAGE_COMMAND_HELP_PARAMETERS, COMMAND_EDIT_PARAMETERS) + LS
+                + String.format(MESSAGE_COMMAND_HELP_EXAMPLE, COMMAND_EDIT_EXAMPLE) + LS;
+    }
     /**
      * Returns the string for showing 'add' command usage instruction
      */
