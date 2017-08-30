@@ -511,6 +511,18 @@ public class AddressBook {
     }
 
     /**
+     * Checks if the value given is valid for the data type(e.g name, email, phone).
+     * @return true if valid, false otherwise
+     */
+    private static boolean isValidValueforType(String val, String dataType) {
+        switch(dataType) {
+            case "name" :
+                return isPersonNameValid(val);
+        }
+        //if invalid data type, false.
+        return false;
+    }
+    /**
      * Adds a person (specified by the command args) to the address book.
      * The entire command arguments string is treated as a string representation of the person to add.
      *
