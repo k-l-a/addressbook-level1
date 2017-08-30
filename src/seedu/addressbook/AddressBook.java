@@ -586,7 +586,7 @@ public class AddressBook {
 
     /**
      * Extracts keywords from the command arguments given for the find persons command.
-     *
+     * Extracted as uppercase for case insensitivity.
      * @param findPersonCommandArgs full command args string for the find persons command
      * @return set of keywords as specified by args
      */
@@ -597,7 +597,8 @@ public class AddressBook {
 
     /**
      * Retrieves all persons in the full model whose names contain some of the specified keywords.
-     *
+     * The names are retrieved as uppercase for case insensitivity.
+     * Names in database are kept as is and not changed.
      * @param keywords for searching
      * @return list of persons in full model with name containing some of the keywords
      */
