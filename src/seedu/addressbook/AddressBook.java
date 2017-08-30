@@ -527,6 +527,15 @@ public class AddressBook {
         return false;
     }
     /**
+     *  Constructs a feedback message for successful edit
+     * @param personEdited
+     *      person that has been edited
+     * @return feedback message
+     */
+    private static String getMessageForSuccessfulEdit(HashMap<String, String> personEdited) {
+        return String.format(MESSAGE_EDIT_SUCCESS, getNameFromPerson(personEdited));
+    }
+    /**
      * Adds a person (specified by the command args) to the address book.
      * The entire command arguments string is treated as a string representation of the person to add.
      *
