@@ -486,6 +486,17 @@ public class AddressBook {
         }
         return true;
     }
+
+    /**
+     * Get the index from a string
+     * @param rawArgs
+     *       string value of index
+     * @return integer value of index
+     */
+    private static int extractTargetIndexFromEditPersonArgs(String rawArgs) {
+        return Integer.parseInt(rawArgs.trim());
+    }
+
     /**
      * Adds a person (specified by the command args) to the address book.
      * The entire command arguments string is treated as a string representation of the person to add.
