@@ -122,6 +122,9 @@ public class AddressBook {
             + "number used in the last find/list call.";
     private static final String COMMAND_EDIT_PARAMETERS = "INDEX PREFIX VALUE";
     private static final String COMMAND_EDIT_EXAMPLE = COMMAND_EDIT_WORD + " 1 " + PERSON_DATA_PREFIX_PHONE + " 98765423";
+    private static final int MIN_EDIT_COMMAND_ARGS = 2;
+    private static final int MAX_EDIT_COMMAND_ARGS = 3;
+    
     private static final String COMMAND_CLEAR_WORD = "clear";
     private static final String COMMAND_CLEAR_DESC = "Clears address book permanently.";
     private static final String COMMAND_CLEAR_EXAMPLE = COMMAND_CLEAR_WORD;
