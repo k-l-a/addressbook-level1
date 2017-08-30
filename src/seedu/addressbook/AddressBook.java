@@ -153,9 +153,9 @@ public class AddressBook {
      * these are the different keys to access their respective details.
      * For example, to access a person's name, use PERSON_PROPERTY_NAME as the key.
      */
-    private static final String PERSON_PROPERTY_NAME = "name";
-    private static final String PERSON_PROPERTY_PHONE = "phone";
-    private static final String PERSON_PROPERTY_EMAIL = "email";
+    private static final String PERSON_DATA_KEY_NAME = "name";
+    private static final String PERSON_DATA_KEY_PHONE = PERSON_DATA_PREFIX_PHONE;
+    private static final String PERSON_DATA_KEY_EMAIL = PERSON_DATA_PREFIX_EMAIL;
     /**
      * The number of data elements for a single person.
      */
