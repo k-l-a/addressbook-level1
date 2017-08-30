@@ -422,6 +422,51 @@ public class AddressBook {
     }
 
     /**
+     * Edits the given data of a person identified by index to the given value.
+     * @param commandArgs commandArgs string from user
+     * @return feedback message indicating success or failure
+     */
+    private static String executeEditPerson(String commandArgs) {
+        //check if the arg is valid
+        if(!isEditPersonArgsValid(commandArgs)) {
+            return getMessageForInvalidCommandInput(COMMAND_EDIT_WORD, getUsageInfoForEditCommand());
+        }
+        
+        ArrayList<String> args = splitByWhitespace(commandArgs);
+        final int index = extractTargetIndexFromEditPersonArgs(args.remove(0)); // remove the index
+        
+        //check if the index is valid
+        if(!isDisplayIndexValidForLastPersonListingView(index)) {
+            return MESSAGE_INVALID_PERSON_DISPLAYED_INDEX;
+        }
+        
+        //determine the field that is intended to change
+        String field;
+        if(args.size() > 1) {
+            //if there is prefix, then the field is that
+            field = args.remove(0);
+        } else {
+            //else the field is name.
+            field = "name";
+        }
+        
+        HashMap<String, String> targetPerson = getPersonByLastVisibleIndex(index);
+        //check if the field is a valid field for the person
+        if(!isValidDataforPerson(field, targetPerson)) {
+            return MESSAGE_INVALID_PERSON_FIELD;
+        }
+        String value = args.remove(0);
+        
+        //check if value is appropriate for the given field
+        if(!isValidValueforType(value, field)) {
+            return MESSAGE_INVALID_VALUE_TYPE;
+        }
+        
+        //change the value
+        targetPerson.put(field, value);
+        return getMessageForSuccessfulEdit(targetPerson);
+    }
+    /**
      * Adds a person (specified by the command args) to the address book.
      * The entire command arguments string is treated as a string representation of the person to add.
      *
