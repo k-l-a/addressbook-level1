@@ -58,6 +58,7 @@ public class AddressBook {
      * at which java String.format(...) method can insert values.
      * =========================================================================
      */
+    private static final String MESSAGE_EDIT_SUCCESS = "Person edited: %1$s";
     private static final String MESSAGE_ADDED = "New person added: %1$s, Phone: %2$s, Email: %3$s";
     private static final String MESSAGE_ADDRESSBOOK_CLEARED = "Address book has been cleared!";
     private static final String MESSAGE_COMMAND_HELP = "%1$s: %2$s";
@@ -67,12 +68,14 @@ public class AddressBook {
     private static final String MESSAGE_DISPLAY_PERSON_DATA = "%1$s  Phone Number: %2$s  Email: %3$s";
     private static final String MESSAGE_DISPLAY_LIST_ELEMENT_INDEX = "%1$d. ";
     private static final String MESSAGE_GOODBYE = "Exiting Address Book... Good bye!";
+    private static final String MESSAGE_INVALID_VALUE_TYPE = "Value is not valid for the given field.";
     private static final String MESSAGE_INVALID_COMMAND_FORMAT = "Invalid command format: %1$s " + LS + "%2$s";
     private static final String MESSAGE_INVALID_FILE = "The given file name [%1$s] is not a valid file name!";
     private static final String MESSAGE_INVALID_PROGRAM_ARGS = "Too many parameters! Correct program argument format:"
             + LS + "\tjava AddressBook"
             + LS + "\tjava AddressBook [custom storage file path]";
     private static final String MESSAGE_INVALID_PERSON_DISPLAYED_INDEX = "The person index provided is invalid";
+    private static final String MESSAGE_INVALID_PERSON_FIELD = "The field provided is invalid";
     private static final String MESSAGE_INVALID_STORAGE_FILE_CONTENT = "Storage file has invalid content";
     private static final String MESSAGE_PERSON_NOT_IN_ADDRESSBOOK = "Person could not be found in address book";
     private static final String MESSAGE_ERROR_CREATING_STORAGE_FILE = "Error: unable to create file: %1$s";
@@ -113,7 +116,15 @@ public class AddressBook {
             + "the last find/list call.";
     private static final String COMMAND_DELETE_PARAMETER = "INDEX";
     private static final String COMMAND_DELETE_EXAMPLE = COMMAND_DELETE_WORD + " 1";
-
+    
+    private static final String COMMAND_EDIT_WORD = "edit";
+    private static final String COMMAND_EDIT_DESC = "Edits a specified field of a person identified by the index " 
+            + "number used in the last find/list call.";
+    private static final String COMMAND_EDIT_PARAMETERS = "INDEX PREFIX VALUE";
+    private static final String COMMAND_EDIT_EXAMPLE = COMMAND_EDIT_WORD + " 1 " + PERSON_DATA_PREFIX_PHONE + " 98765423";
+    private static final int MIN_EDIT_COMMAND_ARGS = 2;
+    private static final int MAX_EDIT_COMMAND_ARGS = 3;
+    
     private static final String COMMAND_CLEAR_WORD = "clear";
     private static final String COMMAND_CLEAR_DESC = "Clears address book permanently.";
     private static final String COMMAND_CLEAR_EXAMPLE = COMMAND_CLEAR_WORD;
@@ -142,9 +153,9 @@ public class AddressBook {
      * these are the different keys to access their respective details.
      * For example, to access a person's name, use PERSON_PROPERTY_NAME as the key.
      */
-    private static final String PERSON_PROPERTY_NAME = "name";
-    private static final String PERSON_PROPERTY_PHONE = "phone";
-    private static final String PERSON_PROPERTY_EMAIL = "email";
+    private static final String PERSON_DATA_KEY_NAME = "name";
+    private static final String PERSON_DATA_KEY_PHONE = PERSON_DATA_PREFIX_PHONE;
+    private static final String PERSON_DATA_KEY_EMAIL = PERSON_DATA_PREFIX_EMAIL;
     /**
      * The number of data elements for a single person.
      */
@@ -369,6 +380,8 @@ public class AddressBook {
         final String commandType = commandTypeAndParams[0];
         final String commandArgs = commandTypeAndParams[1];
         switch (commandType) {
+            case COMMAND_EDIT_WORD:
+                return executeEditPerson(commandArgs);
             case COMMAND_ADD_WORD:
                 return executeAddPerson(commandArgs);
             case COMMAND_FIND_WORD:
@@ -408,6 +421,120 @@ public class AddressBook {
         return String.format(MESSAGE_INVALID_COMMAND_FORMAT, userCommand, correctUsageInfo);
     }
 
+    /**
+     * Edits the given data of a person identified by index to the given value.
+     * @param commandArgs commandArgs string from user
+     * @return feedback message indicating success or failure
+     */
+    private static String executeEditPerson(String commandArgs) {
+        //check if the arg is valid
+        if(!isEditPersonArgsValid(commandArgs)) {
+            return getMessageForInvalidCommandInput(COMMAND_EDIT_WORD, getUsageInfoForEditCommand());
+        }
+        
+        ArrayList<String> args = splitByWhitespace(commandArgs);
+        final int index = extractTargetIndexFromEditPersonArgs(args.remove(0)); // remove the index
+        
+        //check if the index is valid
+        if(!isDisplayIndexValidForLastPersonListingView(index)) {
+            return MESSAGE_INVALID_PERSON_DISPLAYED_INDEX;
+        }
+        
+        //determine the field that is intended to change
+        String field;
+        if(args.size() > 1) {
+            //if there is prefix, then the field is that
+            field = args.remove(0);
+        } else {
+            //else the field is name.
+            field = "name";
+        }
+        
+        HashMap<String, String> targetPerson = getPersonByLastVisibleIndex(index);
+        //check if the field is a valid field for the person
+        if(!isValidDataforPerson(field, targetPerson)) {
+            return MESSAGE_INVALID_PERSON_FIELD;
+        }
+        String value = args.remove(0);
+        
+        //check if value is appropriate for the given field
+        if(!isValidValueforType(value, field)) {
+            return MESSAGE_INVALID_VALUE_TYPE;
+        }
+        
+        //change the value
+        targetPerson.put(field, value);
+        return getMessageForSuccessfulEdit(targetPerson);
+    }
+
+    /**
+     * Check if the given argument is a valid Edit argument.
+     * @param rawArgs
+     *          argument to check
+     * @return true if valid
+     *          false otherwise
+     */
+    private static boolean isEditPersonArgsValid(String rawArgs) {
+        try {
+            ArrayList<String> argArray = splitByWhitespace((rawArgs));
+            if(argArray.size() < MIN_EDIT_COMMAND_ARGS || argArray.size() > MAX_EDIT_COMMAND_ARGS) {
+                return false;
+            }
+            extractTargetIndexFromDeletePersonArgs(argArray.get(0));
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Get the index from a string
+     * @param rawArgs
+     *       string value of index
+     * @return integer value of index
+     */
+    private static int extractTargetIndexFromEditPersonArgs(String rawArgs) {
+        return Integer.parseInt(rawArgs.trim());
+    }
+
+    /**
+     * Checks if the given data field of the given person is valid (i.e non-null)
+     * @param targetField
+     *          data field to check
+     * @param targetPerson
+     *          person to check
+     * @return true if the value of the data field is not null
+     *          false if it is
+     */
+    private static boolean isValidDataforPerson(String targetField, HashMap<String, String> targetPerson) {
+        return !(targetPerson.get(targetField) == null);
+    }
+
+    /**
+     * Checks if the value given is valid for the data type(e.g name, email, phone).
+     * @return true if valid, false otherwise
+     */
+    private static boolean isValidValueforType(String val, String dataType) {
+        switch(dataType) {
+            case "name" :
+                return isPersonNameValid(val);
+            case PERSON_DATA_PREFIX_PHONE :
+                return isPersonPhoneValid(val);
+            case PERSON_DATA_PREFIX_EMAIL :
+                return isPersonEmailValid(val);
+        }
+        //if invalid data type, false.
+        return false;
+    }
+    /**
+     *  Constructs a feedback message for successful edit
+     * @param personEdited
+     *      person that has been edited
+     * @return feedback message
+     */
+    private static String getMessageForSuccessfulEdit(HashMap<String, String> personEdited) {
+        return String.format(MESSAGE_EDIT_SUCCESS, getNameFromPerson(personEdited));
+    }
     /**
      * Adds a person (specified by the command args) to the address book.
      * The entire command arguments string is treated as a string representation of the person to add.
@@ -468,7 +595,7 @@ public class AddressBook {
 
     /**
      * Extracts keywords from the command arguments given for the find persons command.
-     *
+     * Extracted as uppercase for case insensitivity.
      * @param findPersonCommandArgs full command args string for the find persons command
      * @return set of keywords as specified by args
      */
@@ -479,7 +606,8 @@ public class AddressBook {
 
     /**
      * Retrieves all persons in the full model whose names contain some of the specified keywords.
-     *
+     * The names are retrieved as uppercase for case insensitivity.
+     * Names in database are kept as is and not changed.
      * @param keywords for searching
      * @return list of persons in full model with name containing some of the keywords
      */
@@ -620,7 +748,7 @@ public class AddressBook {
     /**
      * Shows a message to the user
      */
-    private static void showToUser(String[] message) {
+    private static void showToUser(String... message) {
         for (String m : message) {
             showToUser(m);
         }
@@ -847,7 +975,7 @@ public class AddressBook {
      * @param person whose name you want
      */
     private static String getNameFromPerson(HashMap<String, String> person) {
-        return person.get(PERSON_PROPERTY_NAME);
+        return person.get(PERSON_DATA_KEY_NAME);
     }
 
     /**
@@ -856,7 +984,7 @@ public class AddressBook {
      * @param person whose phone number you want
      */
     private static String getPhoneFromPerson(HashMap<String, String> person) {
-        return person.get(PERSON_PROPERTY_PHONE);
+        return person.get(PERSON_DATA_KEY_PHONE);
     }
 
     /**
@@ -865,7 +993,7 @@ public class AddressBook {
      * @param person whose email you want
      */
     private static String getEmailFromPerson(HashMap<String, String> person) {
-        return person.get(PERSON_PROPERTY_EMAIL);
+        return person.get(PERSON_DATA_KEY_EMAIL);
     }
 
     /**
@@ -878,9 +1006,9 @@ public class AddressBook {
      */
     private static HashMap<String, String> makePersonFromData(String name, String phone, String email) {
         final HashMap<String, String> person = new HashMap<>();
-        person.put(PERSON_PROPERTY_NAME, name);
-        person.put(PERSON_PROPERTY_PHONE, phone);
-        person.put(PERSON_PROPERTY_EMAIL, email);
+        person.put(PERSON_DATA_KEY_NAME, name);
+        person.put(PERSON_DATA_KEY_PHONE, phone);
+        person.put(PERSON_DATA_KEY_EMAIL, email);
         return person;
     }
 
@@ -1092,7 +1220,8 @@ public class AddressBook {
      * Returns usage info for all commands
      */
     private static String getUsageInfoForAllCommands() {
-        return getUsageInfoForAddCommand() + LS
+        return getUsageInfoForEditCommand() + LS
+                + getUsageInfoForAddCommand() + LS
                 + getUsageInfoForFindCommand() + LS
                 + getUsageInfoForViewCommand() + LS
                 + getUsageInfoForDeleteCommand() + LS
@@ -1101,6 +1230,11 @@ public class AddressBook {
                 + getUsageInfoForHelpCommand();
     }
 
+    private static String getUsageInfoForEditCommand() {
+        return String.format(MESSAGE_COMMAND_HELP, COMMAND_EDIT_WORD, COMMAND_EDIT_DESC) + LS
+                + String.format(MESSAGE_COMMAND_HELP_PARAMETERS, COMMAND_EDIT_PARAMETERS) + LS
+                + String.format(MESSAGE_COMMAND_HELP_EXAMPLE, COMMAND_EDIT_EXAMPLE) + LS;
+    }
     /**
      * Returns the string for showing 'add' command usage instruction
      */
