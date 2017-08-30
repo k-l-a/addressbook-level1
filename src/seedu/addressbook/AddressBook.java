@@ -498,6 +498,19 @@ public class AddressBook {
     }
 
     /**
+     * Checks if the given data field of the given person is valid (i.e non-null)
+     * @param targetField
+     *          data field to check
+     * @param targetPerson
+     *          person to check
+     * @return true if the value of the data field is not null
+     *          false if it is
+     */
+    private static boolean isValidDataforPerson(String targetField, HashMap<String, String> targetPerson) {
+        return !(targetPerson.get(targetField) == null);
+    }
+
+    /**
      * Adds a person (specified by the command args) to the address book.
      * The entire command arguments string is treated as a string representation of the person to add.
      *
