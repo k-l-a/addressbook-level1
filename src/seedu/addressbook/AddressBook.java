@@ -520,6 +520,8 @@ public class AddressBook {
                 return isPersonNameValid(val);
             case PERSON_DATA_PREFIX_PHONE :
                 return isPersonPhoneValid(val);
+            case PERSON_DATA_PREFIX_EMAIL :
+                return isPersonEmailValid(val);
         }
         //if invalid data type, false.
         return false;
