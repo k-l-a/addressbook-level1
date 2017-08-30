@@ -975,7 +975,7 @@ public class AddressBook {
      * @param person whose name you want
      */
     private static String getNameFromPerson(HashMap<String, String> person) {
-        return person.get(PERSON_PROPERTY_NAME);
+        return person.get(PERSON_DATA_KEY_NAME);
     }
 
     /**
@@ -984,7 +984,7 @@ public class AddressBook {
      * @param person whose phone number you want
      */
     private static String getPhoneFromPerson(HashMap<String, String> person) {
-        return person.get(PERSON_PROPERTY_PHONE);
+        return person.get(PERSON_DATA_KEY_PHONE);
     }
 
     /**
@@ -993,7 +993,7 @@ public class AddressBook {
      * @param person whose email you want
      */
     private static String getEmailFromPerson(HashMap<String, String> person) {
-        return person.get(PERSON_PROPERTY_EMAIL);
+        return person.get(PERSON_DATA_KEY_EMAIL);
     }
 
     /**
@@ -1006,9 +1006,9 @@ public class AddressBook {
      */
     private static HashMap<String, String> makePersonFromData(String name, String phone, String email) {
         final HashMap<String, String> person = new HashMap<>();
-        person.put(PERSON_PROPERTY_NAME, name);
-        person.put(PERSON_PROPERTY_PHONE, phone);
-        person.put(PERSON_PROPERTY_EMAIL, email);
+        person.put(PERSON_DATA_KEY_NAME, name);
+        person.put(PERSON_DATA_KEY_PHONE, phone);
+        person.put(PERSON_DATA_KEY_EMAIL, email);
         return person;
     }
 
